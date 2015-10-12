@@ -16,12 +16,13 @@
 #include "TObject.h"
 #include <string>
 
-class THaG2PClockDecode : public THaDetector {
+class THaG2PClockDecode : public THaDetector
+{
 public:
-    THaG2PClockDecode(const char* name, const char* description, THaApparatus* apparatus = NULL);
+    THaG2PClockDecode(const char *name, const char *description, THaApparatus *apparatus = NULL);
     virtual ~THaG2PClockDecode();
-    virtual Int_t Decode(const THaEvData& evdata);
-    virtual void Clear(Option_t* opt = "");
+    virtual Int_t Decode(const THaEvData &evdata);
+    virtual void Clear(Option_t *opt = "");
     virtual void MakePrefix();
 
 protected:
@@ -33,10 +34,10 @@ protected:
     Int_t Nfastbus; //how many fastbus crates
     Int_t fFastbusRocAddr[10];
     virtual Int_t DefineVariables(EMode mode = kDefine);
-    virtual Int_t ReadDatabase(const TDatime& date);
+    virtual Int_t ReadDatabase(const TDatime &date);
 
 private:
-    ClassDef(THaG2PClockDecode, 0)
+    ClassDef(THaG2PClockDecode, 1)
 };
 
 #endif

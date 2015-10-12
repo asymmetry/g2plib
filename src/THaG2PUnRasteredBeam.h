@@ -10,9 +10,10 @@
 #include "THaBeam.h"
 #include <vector>
 
-class THaG2PUnRasteredBeam : public THaBeam {
+class THaG2PUnRasteredBeam : public THaBeam
+{
 public:
-    THaG2PUnRasteredBeam(const char* name, const char* description, Int_t runningsum_depth = 0);
+    THaG2PUnRasteredBeam(const char *name, const char *description, Int_t runningsum_depth = 0);
 
     virtual ~THaG2PUnRasteredBeam()
     {
@@ -29,8 +30,7 @@ protected:
     Int_t fRunningSumNext;
 
 private:
-    ClassDef(THaG2PUnRasteredBeam, 0) // A beam with unrastered beam, analyzed event by event
+    ClassDef(THaG2PUnRasteredBeam, 1) // A beam with unrastered beam, analyzed event by event
 };
 
 #endif
-

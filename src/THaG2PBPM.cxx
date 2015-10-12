@@ -19,7 +19,7 @@
 
 ClassImp(THaG2PBPM)
 
-THaG2PBPM::THaG2PBPM(const char* name, const char* description, THaApparatus* apparatus) : THaBeamDet(name, description, apparatus), fRawSignal(4), fPedestals(4), fCorSignal(4), fRotPos(2), fRot2HCSPos(2, 2)
+THaG2PBPM::THaG2PBPM(const char *name, const char *description, THaApparatus *apparatus) : THaBeamDet(name, description, apparatus), fRawSignal(4), fPedestals(4), fCorSignal(4), fRotPos(2), fRot2HCSPos(2, 2)
 {
     // Constructor
 }
@@ -32,16 +32,17 @@ THaG2PBPM::THaG2PBPM(const char* name, const char* description, THaApparatus* ap
 //                         inconsistent data
 //
 
-Int_t THaG2PBPM::ReadDatabase(const TDatime& date)
+Int_t THaG2PBPM::ReadDatabase(const TDatime &date)
 {
-    static const char* const here = "ReadDatabase()";
+    static const char *const here = "ReadDatabase()";
 
     const int LEN = 100;
     char buf[LEN];
     char *filestatus;
     char keyword[LEN];
 
-    FILE* fi = OpenFile(date);
+    FILE *fi = OpenFile(date);
+
     if (!fi) return kInitError;
 
     // okay, this needs to be changed, but since i dont want to re- or pre-invent
@@ -49,9 +50,11 @@ Int_t THaG2PBPM::ReadDatabase(const TDatime& date)
     // a very fixed syntax:
     sprintf(keyword, "[%s_detmap]", GetName());
     Int_t n = strlen(keyword);
+
     do {
         filestatus = fgets(buf, LEN, fi);
-    } while ((filestatus != NULL)&&(strncmp(buf, keyword, n) != 0));
+    } while ((filestatus != NULL) && (strncmp(buf, keyword, n) != 0));
+
     if (filestatus == NULL) {
         Error(Here(here), "Unexpected end of BPM configuration file");
         fclose(fi);
@@ -62,9 +65,11 @@ Int_t THaG2PBPM::ReadDatabase(const TDatime& date)
     // i dont check each time for end of file, needs to be improved
     fDetMap->Clear();
     int first_chan, crate, dummy, slot, first, last, modulid;
+
     do {
         fgets(buf, LEN, fi);
         sscanf(buf, "%d %d %d %d %d %d %d", &first_chan, &crate, &dummy, &slot, &first, &last, &modulid);
+
         if (first_chan >= 0) {
             if (fDetMap->AddModule(crate, slot, first, last, first_chan) < 0) {
                 Error(Here(here), "Couldnt add BPM to DetMap. Good bye, blue sky, good bye!");
@@ -83,6 +88,7 @@ Int_t THaG2PBPM::DefineVariables(EMode mode)
     // Initialize global variables and lookup table for decoder
 
     if (mode == kDefine && fIsSetup) return kOK;
+
     fIsSetup = (mode == kDefine);
 
     // Register variables in global list
@@ -120,11 +126,9 @@ inline void THaG2PBPM::ClearEvent()
     fCorSignal(1) = -1;
     fCorSignal(2) = -1;
     fCorSignal(3) = -1;
-
-
 }
 
-Int_t THaG2PBPM::Decode(const THaEvData& evdata)
+Int_t THaG2PBPM::Decode(const THaEvData &evdata)
 {
     // clears the event structure
     // loops over all modules defined in the detector map
@@ -132,26 +136,29 @@ Int_t THaG2PBPM::Decode(const THaEvData& evdata)
     // performs pedestal subtraction
 
     ClearEvent();
+
     for (Int_t i = 0; i < fDetMap->GetSize(); i++) {
-        THaDetMap::Module* d = fDetMap->GetModule(i);
+        THaDetMap::Module *d = fDetMap->GetModule(i);
+
         for (Int_t j = 0; j < evdata.GetNumChan(d->crate, d->slot); j++) {
             Int_t chan = evdata.GetNextChan(d->crate, d->slot, j);
-            if ((chan >= d->lo)&&(chan <= d->hi)) {
+
+            if ((chan >= d->lo) && (chan <= d->hi)) {
                 Int_t data = evdata.GetData(d->crate, d->slot, chan, 0);
                 Int_t k = d->first + chan - d->lo - 1;
-                if ((k < 4)&&(fRawSignal(k) == -1)) {
+
+                if ((k < 4) && (fRawSignal(k) == -1)) {
                     fRawSignal(k) = data;
                     fNfired++;
-                } else {
+                } else
                     Warning(Here("Decode()"), "Illegal detector channel: %d", k);
-                }
             }
         }
     }
 
-    if (fNfired != 4) {
+    if (fNfired != 4)
         Warning(Here("Decode()"), "Number of fired Channels out of range. Setting beam position to nominal values");
-    } else {
+    else {
         fCorSignal = fRawSignal;
         fCorSignal -= fPedestals;
     }

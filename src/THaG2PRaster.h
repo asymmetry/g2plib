@@ -10,12 +10,13 @@
 #include "THaBeamDet.h"
 #include "TVector.h"
 
-class THaG2PRaster : public THaBeamDet {
+class THaG2PRaster : public THaBeamDet
+{
 public:
-    THaG2PRaster(const char* name, const char* description = "", THaApparatus* a = NULL);
+    THaG2PRaster(const char *name, const char *description = "", THaApparatus *a = NULL);
     virtual ~THaG2PRaster();
 
-    virtual Int_t Decode(const THaEvData&);
+    virtual Int_t Decode(const THaEvData &);
     virtual Int_t Process();
 
     virtual TVector3 GetPosition() const
@@ -74,10 +75,10 @@ public:
 
 protected:
     void ClearEvent();
-    virtual Int_t ReadDatabase(const TDatime& date);
+    virtual Int_t ReadDatabase(const TDatime &date);
     virtual Int_t DefineVariables(EMode mode = kDefine);
 
-    THaG2PRaster& operator=(const THaG2PRaster&)
+    THaG2PRaster &operator=(const THaG2PRaster &)
     {
         return *this;
     }
@@ -104,7 +105,7 @@ protected:
     Int_t fSLRasterLinear;
 
 private:
-    ClassDef(THaG2PRaster, 0) // Generic Raster class
+    ClassDef(THaG2PRaster, 1) // Generic Raster class
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -26,7 +26,7 @@ using namespace std;
 
 ClassImp(THaG2PUnRasteredBeam)
 
-THaG2PUnRasteredBeam::THaG2PUnRasteredBeam(const char* name, const char* description, Int_t runningsum_depth) : THaBeam(name, description), fRunningSumDepth(runningsum_depth)
+THaG2PUnRasteredBeam::THaG2PUnRasteredBeam(const char *name, const char *description, Int_t runningsum_depth) : THaBeam(name, description), fRunningSumDepth(runningsum_depth)
 {
     AddDetector(new THaG2PBPM("BPMA", "1st bpm", this));
     AddDetector(new THaG2PBPM("BPMB", "2nd bpm", this));

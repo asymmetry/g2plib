@@ -9,9 +9,10 @@
 
 #include "THaBeam.h"
 
-class THaG2PRasteredBeam : public THaBeam {
+class THaG2PRasteredBeam : public THaBeam
+{
 public:
-    THaG2PRasteredBeam(const char* name, const char* description);
+    THaG2PRasteredBeam(const char *name, const char *description);
 
     virtual ~THaG2PRasteredBeam()
     {
@@ -20,8 +21,7 @@ public:
     virtual Int_t Reconstruct();
 
 private:
-    ClassDef(THaG2PRasteredBeam, 0) // A beam with rastered beam, analyzed event by event using raster currents
+    ClassDef(THaG2PRasteredBeam, 1) // A beam with rastered beam, analyzed event by event using raster currents
 };
 
 #endif
-

@@ -19,21 +19,22 @@
 #include "TObject.h"
 #include <string>
 
-class THaG2PHappex : public THaDetector {
+class THaG2PHappex : public THaDetector
+{
 public:
-    THaG2PHappex(const char* name, const char* description, THaApparatus* apparatus = NULL);
+    THaG2PHappex(const char *name, const char *description, THaApparatus *apparatus = NULL);
     virtual ~THaG2PHappex();
-    virtual const char* GetDBFileName() const;
+    virtual const char *GetDBFileName() const;
     virtual void MakePrefix();
 
-    virtual Int_t Decode(const THaEvData& evdata);
-    virtual void Clear(Option_t* opt = "");
+    virtual Int_t Decode(const THaEvData &evdata);
+    virtual void Clear(Option_t *opt = "");
 
 protected:
     Int_t fEvtype; // Current CODA event type
     Int_t fEvtNum;
     virtual Int_t DefineVariables(EMode mode = kDefine);
-    virtual Int_t ReadDatabase(const TDatime& date);
+    virtual Int_t ReadDatabase(const TDatime &date);
 
     // Used by ReadDatabase()
 
@@ -59,11 +60,11 @@ protected:
     Int_t fNumADCHAPPEX, fNumADCHAPPEX_word;
     std::vector<Int_t> fBCMChan, fBPMChan, fRasterChan;
     Int_t *fADCHAPPEX[kMAXADC * 4];
-    Int_t* fQRTHAPPEX, *fHelicityHAPPEX, *fPairHAPPEX;
+    Int_t *fQRTHAPPEX, *fHelicityHAPPEX, *fPairHAPPEX;
     Int_t *fbpma_rawcur_1, *fbpma_rawcur_2, *fbpma_rawcur_3, *fbpma_rawcur_4;
     Int_t *fbpmb_rawcur_1, *fbpmb_rawcur_2, *fbpmb_rawcur_3, *fbpmb_rawcur_4;
     Int_t *fraster_rawcur_x, *fraster_rawcur_y, *fslraster_rawcur_x, *fslraster_rawcur_y;
-    Int_t* fbcmup, *fbcmdown, *fadchelicity;
+    Int_t *fbcmup, *fbcmdown, *fadchelicity;
     Long_t fbcmupc, fbcmdownc;
 
     //for happex tree
@@ -76,12 +77,11 @@ protected:
     Int_t hraster_rawcur_x, hraster_rawcur_y, hslraster_rawcur_x, hslraster_rawcur_y;
     Int_t hbcmup, hbcmdown, hadchelicity;
 
-
 private:
-    static Int_t FindWord(const THaEvData& evdata, const ROCinfo& info);
+    static Int_t FindWord(const THaEvData &evdata, const ROCinfo &info);
     void adc18_decode_data(UInt_t data, UInt_t adcnum);
 
-    ClassDef(THaG2PHappex, 0)
+    ClassDef(THaG2PHappex, 1)
 };
 
 #endif

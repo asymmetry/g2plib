@@ -15,9 +15,7 @@
 
 using namespace std;
 
-THaG2PHappex::THaG2PHappex(const char* name, const char* description, THaApparatus* apparatus) :
-THaDetector(name, description, apparatus),
-fEvtype(0), fEvtNum(0), fHAPPEX(kFALSE), fIHAPPEX(0), fIHAPPEX_read(0), fNumADCHAPPEX(0), fNumADCHAPPEX_word(0), fHAPPEXTREE(kFALSE), fHappexTree(NULL)
+THaG2PHappex::THaG2PHappex(const char *name, const char *description, THaApparatus *apparatus) : THaDetector(name, description, apparatus), fEvtype(0), fEvtNum(0), fHAPPEX(kFALSE), fIHAPPEX(0), fIHAPPEX_read(0), fNumADCHAPPEX(0), fNumADCHAPPEX_word(0), fHAPPEXTREE(kFALSE), fHappexTree(NULL)
 {
     // Constructor
     //cout<<"happex class constructing..."<<endl;
@@ -77,14 +75,16 @@ THaG2PHappex::~THaG2PHappex()
     }
 }
 
-void THaG2PHappex::Clear(Option_t* opt)
+void THaG2PHappex::Clear(Option_t *opt)
 {
     // cout<<"happex clearing..."<<endl;
     THaDetector::Clear(opt);
     fIHAPPEX = 0;
+
     for (Int_t i = 0; i < kMAXADC * 4; i++)
         for (Int_t j = 0; j < fHAPPEXDepth; j++)
             fADCHAPPEX[i][j] = 0;
+
     for (Int_t i = 0; i < fHAPPEXDepth; i++) {
         fHelicityHAPPEX[i] = 0;
         fQRTHAPPEX[i] = 0;
@@ -112,6 +112,7 @@ Int_t THaG2PHappex::DefineVariables(EMode mode)
     // Initialize global variables
 
     if (mode == kDefine && fIsSetup) return kOK;
+
     fIsSetup = (mode == kDefine);
 
     VarDef var[] = {
@@ -171,7 +172,7 @@ Int_t THaG2PHappex::DefineVariables(EMode mode)
     return DefineVarsFromList(var, mode);
 }
 
-const char* THaG2PHappex::GetDBFileName() const
+const char *THaG2PHappex::GetDBFileName() const
 {
     //cout<<"happex getting dbfilename..."<<endl;
     // All happex detectors read from db_happex.dat by default. Database
@@ -188,12 +189,14 @@ void THaG2PHappex::MakePrefix()
     THaDetectorBase::MakePrefix(0);
 }
 
-Int_t THaG2PHappex::ReadDatabase(const TDatime& date)
+Int_t THaG2PHappex::ReadDatabase(const TDatime &date)
 {
     //cout<<"happex reading database..."<<endl;
-    static const char* const here = "THaG2PHappex::ReadDatabase";
-    FILE* file = THaAnalysisObject::OpenFile(GetDBFileName(), date, here, "r", fG2PDebug);
+    static const char *const here = "THaG2PHappex::ReadDatabase";
+    FILE *file = THaAnalysisObject::OpenFile(GetDBFileName(), date, here, "r", fG2PDebug);
+
     if (!file)return THaAnalysisObject::kFileError;
+
     Int_t rocaddr;
     Int_t happexdepth = 0;
     Int_t buildtree = 0;
@@ -208,6 +211,7 @@ Int_t THaG2PHappex::ReadDatabase(const TDatime& date)
     };
     Int_t st = THaAnalysisObject::LoadDB(file, date, req, GetPrefix());
     fclose(file);
+
     if (st)return THaAnalysisObject::kInitError;
 
     fROCinfoh.roc = rocaddr;
@@ -217,15 +221,18 @@ Int_t THaG2PHappex::ReadDatabase(const TDatime& date)
     fHAPPEXDepth = happexdepth;
     fHAPPEX = kFALSE;
     fHAPPEXTREE = kFALSE;
+
     if (fROCinfoh.roc > 0) {
         fHAPPEX = kTRUE;
         fHAPPEXTREE = buildtree > 0;
     }
+
     //     cout<<fROCinfoh.roc<<endl;
     //     cout<<fBCMChan[0]<<" "<<fBCMChan[1]<<endl;
     //     cout<<fBPMChan[0]<<" "<<fBPMChan[1]<<" "<<fBPMChan[2]<<" "<<fBPMChan[3]<<" "<<fBPMChan[4]<<" "<<fBPMChan[5]<<" "<<fBPMChan[6]<<" "<<fBPMChan[7]<<endl;
     //     cout<<fRasterChan[0]<<" "<<fRasterChan[1]<<" "<<fRasterChan[2]<<" "<<fRasterChan[3]<<endl;
     for (Int_t i = 0; i < kMAXADC * 4; i++) fADCHAPPEX[i] = new Int_t[fHAPPEXDepth];
+
     fQRTHAPPEX = new Int_t[fHAPPEXDepth];
     fHelicityHAPPEX = new Int_t[fHAPPEXDepth];
     fPairHAPPEX = new Int_t[fHAPPEXDepth];
@@ -251,21 +258,24 @@ Int_t THaG2PHappex::ReadDatabase(const TDatime& date)
     return THaAnalysisObject::kOK;
 }
 
-Int_t THaG2PHappex::FindWord(const THaEvData& evdata, const ROCinfo& info)
+Int_t THaG2PHappex::FindWord(const THaEvData &evdata, const ROCinfo &info)
 {
     // find the index of the word we are looking for given a header
     // or simply return the index already stored in ROC info (in that case
     // the header stored in ROC info needs to be 0
     // cout<<"happex finding word"<<endl;
     Int_t len = evdata.GetRocLength(info.roc);
+
     if (len <= 4)
         return -1;
 
     Int_t i;
+
     if (info.header == 0)
         i = info.index;
     else {
         for (i = 0; i < len && ((evdata.GetRawData(info.roc, i) & info.header) != info.header); ++i);
+
         i += info.index;
         i++;
     }
@@ -273,15 +283,16 @@ Int_t THaG2PHappex::FindWord(const THaEvData& evdata, const ROCinfo& info)
     return (i < len) ? i : -1;
 }
 
-Int_t THaG2PHappex::Decode(const THaEvData& evdata)
+Int_t THaG2PHappex::Decode(const THaEvData &evdata)
 {
     //cout<<"happex decoding..."<<endl;
-    static const char* here = "THaG2PHappex::Decode";
+    static const char *here = "THaG2PHappex::Decode";
 
     if (!fHAPPEX) {
         ::Error(here, "ROC data (detector map) not properly set up ");
         return -1;
     }
+
     fEvtype = evdata.GetEvType();
     fEvtNum = evdata.GetEvNum();
 
@@ -298,25 +309,29 @@ Int_t THaG2PHappex::Decode(const THaEvData& evdata)
         Int_t hlen = evdata.GetRocLength(happexroc);
         Int_t hdata, hdata1;
         hdata = evdata.GetRawData(happexroc, index++);
-        if (((hdata & 0xbf1ff000) == 0xbf1ff000)&&((hdata & 0xffffffff) != 0xffffffff)) {
+
+        if (((hdata & 0xbf1ff000) == 0xbf1ff000) && ((hdata & 0xffffffff) != 0xffffffff))
             fIHAPPEX = hdata & 0xfff;
-        } else {
+        else
             fIHAPPEX = 0;
-        }
+
         for (Int_t i = index; i < hlen; i++) {
             hdata = evdata.GetRawData(happexroc, i);
-            if ((hdata & 0xbfead000) == 0xbfead000 && ((hdata & 0xffffffff) != 0xffffffff)) {
+
+            if ((hdata & 0xbfead000) == 0xbfead000 && ((hdata & 0xffffffff) != 0xffffffff))
                 fIHAPPEX_read = hdata & 0xfff;
-            }
+
             if ((hdata & 0xbffec000) == 0xbffec000 && ((hdata & 0xffffffff) != 0xffffffff)) {
                 hdata1 = evdata.GetRawData(happexroc, i + 1);
                 fPairHAPPEX[fIHAPPEX_read] = hdata1 & 1;
                 fHelicityHAPPEX[fIHAPPEX_read] = (hdata1 & 2) >> 1;
                 fQRTHAPPEX[fIHAPPEX_read] = (hdata1 & 4) >> 2;
             }
+
             if ((hdata & 0xbfadc000) == 0xbfadc000 && ((hdata & 0xffffffff) != 0xffffffff)) {
                 fNumADCHAPPEX = hdata & 0xf;
                 fNumADCHAPPEX_word = (hdata & 0xf0) >> 4;
+
                 for (Int_t j = 0; j < fNumADCHAPPEX; j++) {
                     for (Int_t k = i + 2 + j * fNumADCHAPPEX_word; k < i + 2 + (j + 1) * fNumADCHAPPEX_word; k++) {
                         hdata1 = evdata.GetRawData(happexroc, k);
@@ -345,6 +360,7 @@ Int_t THaG2PHappex::Decode(const THaEvData& evdata)
         fadchelicity[i] = fADCHAPPEX[fBCMChan[2]][i];
         fbcmupc += fADCHAPPEX[fBCMChan[0]][i];
         fbcmdownc += fADCHAPPEX[fBCMChan[1]][i];
+
         //for happex tree
         if (fHAPPEXTREE) {
             hQRTHAPPEX = fQRTHAPPEX[i];
@@ -367,6 +383,7 @@ Int_t THaG2PHappex::Decode(const THaEvData& evdata)
             hadchelicity = fadchelicity[i];
             fHappexTree->Fill();
         }
+
         ringentry++;
     }
 
@@ -383,17 +400,21 @@ void THaG2PHappex::adc18_decode_data(UInt_t data, UInt_t adcnum)
     Double_t diff_avg;
 
     if (data & 0x80000000) { //header
-        module_id = (0x1F)&(data >> 26);
+        module_id = (0x1F) & (data >> 26);
         event_number = data & 0x3FFFFFF;
     } else { //data
-        ch_number = (0x3)&(data >> 29);
-        div_n = ((0x3)&(data >> 25));
+        ch_number = (0x3) & (data >> 29);
+        div_n = ((0x3) & (data >> 25));
         divider = 1;
+
         for (ii = 0; ii < (Int_t) div_n; ii++)
             divider = divider * 2;
-        data_type = (0x7)&(data >> 22);
+
+        data_type = (0x7) & (data >> 22);
+
         if (data_type == 0) {
             diff_value = (0x1FFFFF) & data;
+
             if (data & 0x200000) {
                 sign = -1;
                 difference = sign * ((~diff_value & 0x1FFFFF) + 1); // 2's complement
@@ -401,8 +422,10 @@ void THaG2PHappex::adc18_decode_data(UInt_t data, UInt_t adcnum)
                 sign = 1;
                 difference = diff_value;
             }
+
             diff_avg = ((Float_t) difference) / ((Float_t) divider);
-            if (ch_number >= 0 && ch_number < kNADCCHAN)
+
+            if (ch_number < kNADCCHAN)
                 fADCHAPPEX[ch_number + adcnum * 4][fIHAPPEX_read] = Int_t(diff_avg);
         }
     }

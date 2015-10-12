@@ -20,7 +20,7 @@
 
 using namespace std;
 
-THaG2PRaster::THaG2PRaster(const char* name, const char* description, THaApparatus* apparatus) : THaBeamDet(name, description, apparatus), fSLRawPos(2), fRawPos(2), fRasterFreq(2), fSLRasterFreq(2), fSlopePedestal(2), fRasterPedestal(2), fSLRasterPedestal(2)
+THaG2PRaster::THaG2PRaster(const char *name, const char *description, THaApparatus *apparatus) : THaBeamDet(name, description, apparatus), fSLRawPos(2), fRawPos(2), fRasterFreq(2), fSLRasterFreq(2), fSlopePedestal(2), fRasterPedestal(2), fSLRasterPedestal(2)
 {
     // Constructor
 
@@ -39,16 +39,17 @@ THaG2PRaster::THaG2PRaster(const char* name, const char* description, THaApparat
 //                         inconsistent data
 //
 
-Int_t THaG2PRaster::ReadDatabase(const TDatime& date)
+Int_t THaG2PRaster::ReadDatabase(const TDatime &date)
 {
-    static const char* const here = "ReadDatabase()";
+    static const char *const here = "ReadDatabase()";
 
     const int LEN = 100;
     char buf[LEN];
     char *filestatus;
     char keyword[LEN];
 
-    FILE* fi = OpenFile(date);
+    FILE *fi = OpenFile(date);
+
     if (!fi) return kFileError;
 
     // okay, this needs to be changed, but since i dont want to re- or pre-invent
@@ -61,7 +62,8 @@ Int_t THaG2PRaster::ReadDatabase(const TDatime& date)
 
     do {
         filestatus = fgets(buf, LEN, fi);
-    } while ((filestatus != NULL)&&(strncmp(buf, keyword, n) != 0));
+    } while ((filestatus != NULL) && (strncmp(buf, keyword, n) != 0));
+
     if (filestatus == NULL) {
         Error(Here("ReadDataBase()"), "Unexpected end of raster configuration file");
         fclose(fi);
@@ -77,6 +79,7 @@ Int_t THaG2PRaster::ReadDatabase(const TDatime& date)
     do {
         fgets(buf, LEN, fi);
         sscanf(buf, "%d %d %d %d %d %d %d", &first_chan, &crate, &dummy, &slot, &first, &last, &modulid);
+
         if (first_chan >= 0) {
             if (fDetMap->AddModule(crate, slot, first, last, first_chan) < 0) {
                 Error(Here(here), "Couldnt add Raster to DetMap. Good bye, blue sky, good bye!");
@@ -95,6 +98,7 @@ Int_t THaG2PRaster::DefineVariables(EMode mode)
     // Initialize global variables and lookup table for decoder
 
     if (mode == kDefine && fIsSetup) return kOK;
+
     fIsSetup = (mode == kDefine);
 
     // Register variables in global list
@@ -132,7 +136,7 @@ inline void THaG2PRaster::ClearEvent()
     fNfired = 0;
 }
 
-Int_t THaG2PRaster::Decode(const THaEvData& evdata)
+Int_t THaG2PRaster::Decode(const THaEvData &evdata)
 {
     // clears the event structure
     // loops over all modules defined in the detector map
@@ -144,30 +148,31 @@ Int_t THaG2PRaster::Decode(const THaEvData& evdata)
     UInt_t chancnt = 0;
 
     for (Int_t i = 0; i < fDetMap->GetSize(); i++) {
-        THaDetMap::Module* d = fDetMap->GetModule(i);
+        THaDetMap::Module *d = fDetMap->GetModule(i);
 
         for (Int_t j = 0; j < evdata.GetNumChan(d->crate, d->slot); j++) {
             Int_t chan = evdata.GetNextChan(d->crate, d->slot, j);
-            if ((chan >= d->lo)&&(chan <= d->hi)) {
+
+            if ((chan >= d->lo) && (chan <= d->hi)) {
                 Int_t data = evdata.GetData(d->crate, d->slot, chan, 0);
                 Int_t k = chancnt + d->first + chan - d->lo - 1;
+
                 if (k < 2) {
                     fRawPos(k) = data;
                     fNfired++;
                 } else if (k < 4) {
                     fSLRawPos(k - 2) = data;
                     fNfired++;
-                } else {
+                } else
                     Warning(Here("Decode()"), "Illegal detector channel: %d", k);
-                }
             }
         }
+
         chancnt += d->hi - d->lo + 1;
     }
 
-    if (fNfired != 4) {
+    if (fNfired != 4)
         Warning(Here("Decode()"), "Number of fired Channels out of range. Setting beam position to nominal values");
-    }
 
     return 0;
 }
@@ -179,4 +184,3 @@ Int_t THaG2PRaster::Process()
 
 ////////////////////////////////////////////////////////////////////////////////
 ClassImp(THaG2PRaster)
-

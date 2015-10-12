@@ -18,7 +18,7 @@
 
 ClassImp(THaG2PRasteredBeam)
 
-THaG2PRasteredBeam::THaG2PRasteredBeam(const char* name, const char* description) : THaBeam(name, description)
+THaG2PRasteredBeam::THaG2PRasteredBeam(const char *name, const char *description) : THaBeam(name, description)
 {
     AddDetector(new THaG2PRaster("Raster", "raster", this));
 }
